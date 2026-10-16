@@ -1,0 +1,245 @@
+const textInput = document.getElementById('textInput');
+const textOutput = document.getElementById('textOutput');
+const charCount = document.getElementById('charCount');
+const wordCount = document.getElementById('wordCount');
+const lineCount = document.getElementById('lineCount');
+const themeToggle = document.getElementById('themeToggle');
+
+function updateTextStats() {
+  const value = textInput.value;
+  charCount.textContent = value.length;
+  wordCount.textContent = value.trim() ? value.trim().split(/\s+/).length : 0;
+  lineCount.textContent = value ? value.split(/\r\n|\r|\n/).length : 0;
+}
+
+textInput.addEventListener('input', () => {
+  updateTextStats();
+});
+
+document.querySelectorAll('[data-transform]').forEach((button) => {
+  button.addEventListener('click', () => {
+    const value = textInput.value;
+    const transform = button.dataset.transform;
+
+    let result = value;
+
+    switch (transform) {
+      case 'upper':
+        result = value.toUpperCase();
+        break;
+      case 'lower':
+        result = value.toLowerCase();
+        break;
+      case 'title':
+        result = value.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+        break;
+      case 'reverse':
+        result = [...value].reverse().join('');
+        break;
+      default:
+        break;
+    }
+
+    textOutput.value = result;
+  });
+});
+
+const jsonInput = document.getElementById('jsonInput');
+const formatJsonBtn = document.getElementById('formatJsonBtn');
+const minifyJsonBtn = document.getElementById('minifyJsonBtn');
+
+function safeJsonParse(value) {
+  try {
+    return JSON.parse(value);
+  } catch (error) {
+    return null;
+  }
+}
+
+formatJsonBtn.addEventListener('click', () => {
+  const parsed = safeJsonParse(jsonInput.value);
+  if (parsed === null) {
+    alert('JSON invalide.');
+    return;
+  }
+  jsonInput.value = JSON.stringify(parsed, null, 2);
+});
+
+minifyJsonBtn.addEventListener('click', () => {
+  const parsed = safeJsonParse(jsonInput.value);
+  if (parsed === null) {
+    alert('JSON invalide.');
+    return;
+  }
+  jsonInput.value = JSON.stringify(parsed);
+});
+
+const baseInput = document.getElementById('baseInput');
+const encodeBase64Btn = document.getElementById('encodeBase64Btn');
+const decodeBase64Btn = document.getElementById('decodeBase64Btn');
+
+encodeBase64Btn.addEventListener('click', () => {
+  try {
+    baseInput.value = btoa(unescape(encodeURIComponent(baseInput.value)));
+  } catch (error) {
+    alert('Erreur lors de l\'encodage Base64.');
+  }
+});
+
+decodeBase64Btn.addEventListener('click', () => {
+  try {
+    baseInput.value = decodeURIComponent(escape(atob(baseInput.value)));
+  } catch (error) {
+    alert('La valeur Base64 n\'est pas valide.');
+  }
+});
+
+const urlInput = document.getElementById('urlInput');
+const encodeUrlBtn = document.getElementById('encodeUrlBtn');
+const decodeUrlBtn = document.getElementById('decodeUrlBtn');
+
+encodeUrlBtn.addEventListener('click', () => {
+  urlInput.value = encodeURIComponent(urlInput.value);
+});
+
+decodeUrlBtn.addEventListener('click', () => {
+  try {
+    urlInput.value = decodeURIComponent(urlInput.value);
+  } catch (error) {
+    alert('URL invalide.');
+  }
+});
+
+const calcInput = document.getElementById('calcInput');
+const calcResult = document.getElementById('calcResult');
+const calcBtn = document.getElementById('calcBtn');
+const clearCalcBtn = document.getElementById('clearCalcBtn');
+
+calcBtn.addEventListener('click', () => {
+  try {
+    const result = Function(`"use strict"; return (${calcInput.value})`)();
+    calcResult.value = result;
+  } catch (error) {
+    calcResult.value = 'Erreur';
+  }
+});
+
+clearCalcBtn.addEventListener('click', () => {
+  calcInput.value = '';
+  calcResult.value = '';
+});
+
+const percentValue = document.getElementById('percentValue');
+const percentRate = document.getElementById('percentRate');
+const percentResult = document.getElementById('percentResult');
+const percentBtn = document.getElementById('percentBtn');
+
+percentBtn.addEventListener('click', () => {
+  const value = Number(percentValue.value);
+  const rate = Number(percentRate.value);
+
+  if (Number.isNaN(value) || Number.isNaN(rate)) {
+    percentResult.value = 'Valeurs invalides';
+    return;
+  }
+
+  percentResult.value = `${rate}% de ${value} = ${(value * rate) / 100}`;
+});
+
+const passLength = document.getElementById('passLength');
+const passOutput = document.getElementById('passOutput');
+const passBtn = document.getElementById('passBtn');
+
+passBtn.addEventListener('click', () => {
+  const length = Number(passLength.value) || 16;
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}';
+  let password = '';
+
+  for (let i = 0; i < length; i += 1) {
+    password += chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  passOutput.value = password;
+});
+
+const colorInput = document.getElementById('colorInput');
+const colorOutput = document.getElementById('colorOutput');
+const colorBtn = document.getElementById('colorBtn');
+
+function hexToRgb(hex) {
+  const clean = hex.replace('#', '');
+  const full = clean.length === 3 ? clean.split('').map((char) => char + char).join('') : clean;
+  const num = Number.parseInt(full, 16);
+
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+}
+
+colorBtn.addEventListener('click', () => {
+  const rgb = hexToRgb(colorInput.value);
+  colorOutput.value = `HEX: ${colorInput.value.toUpperCase()} • RGB: ${rgb.r}, ${rgb.g}, ${rgb.b}`;
+});
+
+const remValue = document.getElementById('remValue');
+const remOutput = document.getElementById('remOutput');
+const pxBtn = document.getElementById('pxBtn');
+
+pxBtn.addEventListener('click', () => {
+  const px = Number(remValue.value);
+  remOutput.value = `${px / 16}rem`;
+});
+
+const dateInput = document.getElementById('dateInput');
+const dateOutput = document.getElementById('dateOutput');
+const todayBtn = document.getElementById('todayBtn');
+const diffBtn = document.getElementById('diffBtn');
+
+const now = new Date();
+dateInput.value = now.toISOString().split('T')[0];
+
+function getDaysUntil(dateString) {
+  const today = new Date();
+  const future = new Date(dateString);
+  const diff = future - today;
+  return Math.ceil(diff / (1000 * 60 * 60 * 24));
+}
+
+todayBtn.addEventListener('click', () => {
+  dateOutput.value = new Date().toLocaleDateString('fr-FR', { dateStyle: 'full' });
+});
+
+diffBtn.addEventListener('click', () => {
+  const selected = dateInput.value;
+  if (!selected) {
+    dateOutput.value = 'Sélectionnez une date.';
+    return;
+  }
+  const days = getDaysUntil(selected);
+  dateOutput.value = `${days} jours restants`;
+});
+
+const tempInput = document.getElementById('tempInput');
+const tempOutput = document.getElementById('tempOutput');
+const cToFBtn = document.getElementById('cToFBtn');
+const fToCBtn = document.getElementById('fToCBtn');
+
+cToFBtn.addEventListener('click', () => {
+  const c = Number(tempInput.value);
+  tempOutput.value = `${(c * 9) / 5 + 32}°F`;
+});
+
+fToCBtn.addEventListener('click', () => {
+  const f = Number(tempInput.value);
+  tempOutput.value = `${((f - 32) * 5) / 9}°C`;
+});
+
+themeToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  themeToggle.textContent = isDark ? '☀️ Mode clair' : '🌙 Mode sombre';
+});
+
+updateTextStats();
